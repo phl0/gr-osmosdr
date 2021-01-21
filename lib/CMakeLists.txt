@@ -222,7 +222,7 @@ endif(ENABLE_AIRSPY)
 ########################################################################
 GR_REGISTER_COMPONENT("SpyServer Receiver" ENABLE_SPYSERVER)
 if(ENABLE_SPYSERVER)
-GR_INCLUDE_SUBDIRECTORY(spyserver)
+    add_subdirectory(spyserver)
 endif(ENABLE_SPYSERVER)
 
 ########################################################################
