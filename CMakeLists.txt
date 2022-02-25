@@ -55,13 +55,65 @@ include(GrVersion) #setup version info
 # Compiler specific setup
 ########################################################################
 
-if((CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR
-    CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    AND NOT WIN32)
-    #http://gcc.gnu.org/wiki/Visibility
-    add_definitions(-fvisibility=hidden)
-    add_definitions(-fvisibility-inlines-hidden)
-endif()
+IF(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64|AMD64|x86")
+ SET(USE_SIMD "SSE2" CACHE STRING "Use SIMD instructions")
+ELSE()
+ SET(USE_SIMD "no" CACHE STRING "Use SIMD instructions")
+ENDIF()
+ SET(USE_SIMD_VALUES "no" "SSE2" "AVX")
+ SET_PROPERTY(CACHE USE_SIMD PROPERTY STRINGS ${USE_SIMD_VALUES})
+ LIST(FIND USE_SIMD_VALUES ${USE_SIMD} USE_SIMD_INDEX)
+ IF(${USE_SIMD_INDEX} EQUAL -1)
+   message(FATAL_ERROR "Option ${USE_SIMD} not supported, valid entries are ${USE_SIMD_VALUES}")
+ ENDIF()
+
+IF(CMAKE_CXX_COMPILER MATCHES ".*clang")
+    SET(CMAKE_COMPILER_IS_CLANGXX 1)
+ENDIF()
+
+IF(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX)
+    ADD_DEFINITIONS(-std=c++11)
+    ADD_DEFINITIONS(-Wall)
+    ADD_DEFINITIONS(-Wextra)
+    ADD_DEFINITIONS(-Wno-unused-parameter)
+    ADD_DEFINITIONS(-Wsign-compare)
+    #ADD_DEFINITIONS(-Wconversion)
+    #ADD_DEFINITIONS(-pedantic)
+    #ADD_DEFINITIONS(-ansi)
+    IF(NOT WIN32)
+        #only export symbols that are declared to be part of the api (non dll platforms)
+        ADD_DEFINITIONS(-fvisibility=hidden)
+        ADD_DEFINITIONS(-fvisibility-inlines-hidden)
+    ENDIF(NOT WIN32)
+    IF(USE_SIMD MATCHES SSE2)
+        ADD_DEFINITIONS(-msse2)
+        ADD_DEFINITIONS(-DUSE_SSE2)
+    ENDIF()
+    IF(USE_SIMD MATCHES AVX)
+        ADD_DEFINITIONS(-march=native)
+        ADD_DEFINITIONS(-DUSE_AVX)
+    ENDIF()
+ELSEIF(MSVC)
+    IF(USE_SIMD MATCHES SSE2)
+        ADD_DEFINITIONS(/arch:SSE2)
+        ADD_DEFINITIONS(-DUSE_SSE2)
+    ENDIF()
+    IF(USE_SIMD MATCHES AVX)
+        ADD_DEFINITIONS(/arch:AVX)
+        ADD_DEFINITIONS(-DUSE_AVX)
+    ENDIF()
+ENDIF()
+
+########################################################################
+# Setup boost
+########################################################################
+MESSAGE(STATUS "Configuring Boost C++ Libraries...")
+
+# Although not required on my system, some users have linking issues without
+SET(BOOST_REQUIRED_COMPONENTS
+    thread
+    system
+)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     set(CMAKE_CXX_STANDARD 11)

@@ -157,12 +157,17 @@ documentation: |-
   While primarily being developed for the OsmoSDR hardware, this block as well supports:
 
   % if sourk == 'source':
+   * FUNcube Dongle through libgnuradio-fcd
+   * FUNcube Dongle Pro+ through gr-fcdproplus
+   * sysmocom OsmoSDR Devices through libosmosdr
    * RTL2832U based DVB-T dongles through librtlsdr
    * RTL-TCP spectrum server (see librtlsdr project)
+   * MSi2500 based DVB-T dongles through libmirisdr
    * SDRplay RSP devices through SDRplay library
    * gnuradio .cfile input through libgnuradio-blocks
    * RFSPACE SDR-IQ, SDR-IP, NetSDR (incl. X2 option)
    * AirSpy Wideband Receiver through libairspy
+   * SpyServer Devices through spyserver
   % endif
   % if sourk == 'sink':
    * gnuradio .cfile output through libgnuradio-blocks
@@ -191,17 +196,21 @@ documentation: |-
   Lines ending with ... mean it's possible to bind devices together by specifying multiple device arguments separated with a space.
 
   % if sourk == 'source':
+    fcd=0[,device=hw:2][,type=2]
+    miri=0[,buffers=32] ...
     rtl=serial_number ...
     rtl=0[,rtl_xtal=28.8e6][,tuner_xtal=28.8e6] ...
     rtl=1[,buffers=32][,buflen=N*512] ...
     rtl=2[,direct_samp=0|1|2][,offset_tune=0|1][,bias=0|1] ...
     rtl_tcp=127.0.0.1:1234[,psize=16384][,direct_samp=0|1|2][,offset_tune=0|1][,bias=0|1] ...
+    osmosdr=0[,buffers=32][,buflen=N*512] ...
     file='/path/to/your file',rate=1e6[,freq=100e6][,repeat=true][,throttle=true] ...
     netsdr=127.0.0.1[:50000][,nchan=2]
     sdr-ip=127.0.0.1[:50000]
     cloudiq=127.0.0.1[:50000]
     sdr-iq=/dev/ttyUSB0
     airspy=0[,bias=0|1][,linearity][,sensitivity]
+    spyserver=0,ip=192.168.0.10[,port=5555]
   % endif
   % if sourk == 'sink':
     file='/path/to/your file',rate=1e6[,freq=100e6][,append=true][,throttle=true] ...

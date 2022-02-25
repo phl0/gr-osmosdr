@@ -218,6 +218,14 @@ if(ENABLE_AIRSPY)
 endif(ENABLE_AIRSPY)
 
 ########################################################################
+# Setup SPYSERVER component
+########################################################################
+GR_REGISTER_COMPONENT("SpyServer Receiver" ENABLE_SPYSERVER)
+if(ENABLE_SPYSERVER)
+    add_subdirectory(spyserver)
+endif(ENABLE_SPYSERVER)
+
+########################################################################
 # Setup AIRSPYHF component
 ########################################################################
 GR_REGISTER_COMPONENT("AIRSPY HF+ Receiver" ENABLE_AIRSPYHF LIBAIRSPYHF_FOUND)
